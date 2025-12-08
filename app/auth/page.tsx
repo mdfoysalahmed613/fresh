@@ -6,7 +6,6 @@ import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function AuthPage() {
-
    return (
       <div className="relative flex bg-sidebar min-h-svh w-full items-center justify-center p-4 md:p-6">
          <div className="absolute left-4 top-4 md:left-8 md:top-8">
