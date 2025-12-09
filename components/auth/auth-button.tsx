@@ -3,8 +3,6 @@
 import { Button } from "../ui/button";
 import Link from "next/link";
 import {
-   Settings,
-   User as UserIcon,
    Shield,
    User,
 } from "lucide-react";
@@ -27,18 +25,16 @@ import { LogoutMenuItem } from "@/components/ui/logout-menu-item";
 export default function AuthButton() {
    const { user, refreshUser } = useUser();
    const [isDialogOpen, setIsDialogOpen] = useState(false);
-
    if (!user) {
       return (
-         <Button variant="ghost" size="icon" asChild>
+         <Button asChild>
             <Link href="/auth">
-               <UserIcon className="h-5 w-5" />
+               Login
                <span className="sr-only">Login</span>
             </Link>
          </Button>
       );
    }
-   console.log("Authenticated user:", user);
    return (
       <>
          <DropdownMenu>

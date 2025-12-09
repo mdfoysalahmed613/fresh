@@ -2,67 +2,47 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { User } from "@supabase/supabase-js";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 interface UserContextType {
    user: User | null;
-   isLoading: boolean;
    refreshUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
-   const [user, setUser] = useState<User | null>(null);
-   const [isLoading, setIsLoading] = useState(true);
-   const supabase = createClient();
+export function UserProvider({ children, initialUser }: { children: React.ReactNode; initialUser: User | null }) {
 
-   const fetchUser = async () => {
-      try {
-         const {
-            data: { user },
-         } = await supabase.auth.getUser();
-         setUser(user);
-      } catch (error) {
-         console.error("Error fetching user:", error);
-         setUser(null);
-      } finally {
-         setIsLoading(false);
-      }
+   const [user, setUser] = useState<User | null>(initialUser);
+   const supabase = useMemo(() => createClient(), []);
+
+   const refreshUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
    };
-   console.log("UserProvider render, current user:", user);
 
    useEffect(() => {
-      let mounted = true;
 
-      const initAuth = async () => {
-         if (mounted) {
-            await fetchUser();
-         }
-      };
-
-      initAuth();
-
-      const {
-         data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-         if (mounted) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+         setUser(session?.user ?? null);
+         if (event === 'SIGNED_OUT') {
+            setUser(null);
+         } else {
+            // If any other event (SIGNED_IN, TOKEN_REFRESHED, USER_UPDATED) occurs
+            // The subscription returns the latest session, but we also expose refreshUser
             setUser(session?.user ?? null);
-            setIsLoading(false);
          }
       });
 
       return () => {
-         mounted = false;
          subscription.unsubscribe();
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, []);
+   }, [supabase]);
 
    return (
-      <UserContext value={{ user, isLoading, refreshUser: fetchUser }}>
+      <UserContext.Provider value={{ user, refreshUser }}>
          {children}
-      </UserContext>
+      </UserContext.Provider>
    );
 }
 

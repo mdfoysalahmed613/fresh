@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react'
+import { useState } from 'react'
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -13,7 +13,6 @@ import {
    SidebarMenu,
    SidebarMenuButton,
    SidebarMenuItem,
-   SidebarMenuSkeleton,
    useSidebar,
 } from "@/components/ui/sidebar"
 import { EllipsisVertical, User } from 'lucide-react'
@@ -26,18 +25,8 @@ import { LogoutMenuItem } from '@/components/ui/logout-menu-item'
 const FooterUser = () => {
    const [isDialogOpen, setIsDialogOpen] = useState(false)
    const { isMobile } = useSidebar()
-   const { user, refreshUser, isLoading } = useUser();
-
-   if (isLoading) {
-      return (
-         <SidebarMenu>
-            <SidebarMenuItem>
-               <SidebarMenuSkeleton className="px-3 py-6" />
-            </SidebarMenuItem>
-         </SidebarMenu>
-      )
-   }
-
+   const { user, refreshUser } = useUser();
+   
    if (!user) return null;
    return (
       <>

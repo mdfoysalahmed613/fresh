@@ -1,9 +1,9 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 export function LogoutMenuItem() {
    const supabase = createClient();
@@ -11,7 +11,7 @@ export function LogoutMenuItem() {
 
    const handleLogout = async () => {
       await supabase.auth.signOut();
-      router.push("/auth");
+      router.refresh();
    };
 
    return (
